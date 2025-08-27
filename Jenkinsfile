@@ -1,83 +1,60 @@
 pipeline {
     agent any
+            
+    // triggers {
+    //     pollSCM '* * * * *'
+    // }
     
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                echo 'Récupération du code source...'
-                checkout scm
-            }
-        }
-        
-        stage('Setup Python Environment') {
-            steps {
-                echo 'Configuration de l\'environnement Python...'
-                dir('myapp') {
-                    // Créer un environnement virtuel
-                    sh 'python3 -m venv venv'
-                    
-                    // Activer l'environnement et installer les dépendances
-                    sh '''
-                        . venv/bin/activate
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                    '''
-                }
+                echo "Building.."
+                sh '''
+                # Installer python3-venv si nécessaire
+                sudo apt update
+                sudo apt install -y python3-venv python3-full
+                
+                cd myapp
+                
+                # Créer un environnement virtuel
+                python3 -m venv venv
+                
+                # Activer l'environnement virtuel et installer les dépendances
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
         
         stage('Test') {
             steps {
-                echo 'Exécution des tests...'
-                dir('myapp') {
-                    sh '''
-                        . venv/bin/activate
-                        python -m pytest tests/ --junitxml=test-results.xml
-                    '''
-                }
-            }
-            post {
-                always {
-                    // Publication des résultats de tests
-                    junit 'myapp/test-results.xml'
-                }
+                echo "Testing.."
+                sh '''
+                cd myapp
+                
+                # Activer l'environnement virtuel pour les tests
+                . venv/bin/activate
+                python3 hello.py
+                python3 hello.py --name=Brad
+                '''
             }
         }
         
-        stage('Build/Package') {
+        stage('Deliver') {
             steps {
-                echo 'Construction de l\'application...'
-                dir('myapp') {
-                    sh '''
-                        . venv/bin/activate
-                        python setup.py build
-                        # ou python -m build pour les projets avec pyproject.toml
-                    '''
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo 'Déploiement en cours...'
-                dir('myapp') {
-                    sh '''
-                        . venv/bin/activate
-                        # Commandes de déploiement
-                        echo "Déploiement simulé"
-                    '''
-                }
+                echo 'Deliver....'
+                sh '''
+                echo "doing delivery stuff.."
+                '''
             }
         }
     }
     
     post {
         always {
+            // Nettoyage optionnel
             echo 'Pipeline terminé'
-            cleanWs()
         }
         success {
             echo 'Pipeline exécuté avec succès!'
