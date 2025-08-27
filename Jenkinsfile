@@ -7,10 +7,6 @@ pipeline {
         }
     }
             
-    // triggers {
-    //     pollSCM '* * * * *'
-    // }
-    
     stages {
         stage('Build') {
             steps {
@@ -45,9 +41,9 @@ pipeline {
     }
     
     post {
-        always {
-            echo 'Pipeline terminé'
-        }
+        // always {
+        //     echo 'Pipeline terminé'
+        // }
         success {
             echo 'Pipeline exécuté avec succès!'
         }
