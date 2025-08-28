@@ -2,7 +2,8 @@ pipeline {
     agent {
         docker {
             image 'python:3.11'
-            // Cette image contient déjà tout ce qu'il faut
+            args '-u root:root'
+            reuseNode true
         }
     }
             
