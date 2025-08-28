@@ -12,7 +12,7 @@ pipeline {
                 sh '''
                 # Installer python3-venv si nécessaire
                 sudo apt update
-                sudo apt install -y python3-venv python3-full
+                sudo apt install -y python3.11-venv python3-full
                 
                 cd myapp
                 
