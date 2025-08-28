@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.11'
+            // Cette image contient déjà tout ce qu'il faut
+        }
+    }
             
     // triggers {
     //     pollSCM '* * * * *'
@@ -10,17 +15,7 @@ pipeline {
             steps {
                 echo "Building.."
                 sh '''
-                # Installer python3-venv si nécessaire
-                sudo apt update
-                sudo apt install -y python3.11-venv python3-full
-                
                 cd myapp
-                
-                # Créer un environnement virtuel
-                python3 -m venv venv
-                
-                # Activer l'environnement virtuel et installer les dépendances
-                . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -32,9 +27,6 @@ pipeline {
                 echo "Testing.."
                 sh '''
                 cd myapp
-                
-                # Activer l'environnement virtuel pour les tests
-                . venv/bin/activate
                 python3 hello.py
                 python3 hello.py --name=Brad
                 '''
@@ -53,7 +45,6 @@ pipeline {
     
     post {
         always {
-            // Nettoyage optionnel
             echo 'Pipeline terminé'
         }
         success {
